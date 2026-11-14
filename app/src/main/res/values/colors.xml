@@ -1,0 +1,4 @@
+<resources>
+    <!-- 앱 아이콘 바탕색 (연한 라벤더) -->
+    <color name="ic_launcher_background">#EDE6FA</color>
+</resources>

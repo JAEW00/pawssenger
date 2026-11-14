@@ -1,0 +1,19 @@
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+.kotlin/
+*.apk
+!apk/.gitkeep
+
+# 기획 관련 문서 (저장소에 올리지 않는다)
+docs/PAWSSENGER___Pleos_plans.pdf
+docs/pawssenger_plans.md
+docs/pawssenger_dev_guide.md
+docs/ref1.png
+docs/ref2.jpg
+docs/ref_main_menu.png
+
+# 디자인 시안 (저장소에 올리지 않는다)
+docs/pawssenger-handoff/

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-feature android:name="android.hardware.type.automotive" android:required="true" />
+    <!-- 차량 속도 (AAOS 표준, 사용자 허용 필요) -->
+    <uses-permission android:name="android.car.permission.CAR_SPEED" />
+    <!-- Pleos Vehicle SDK: 조향각·기어·브레이크·트립 / 창문 / 공조 / 좌석 (선언만으로 부여) -->
+    <uses-permission android:name="pleos.car.permission.CAR_DRIVE" />
+    <uses-permission android:name="pleos.car.permission.CAR_WINDOWS" />
+    <uses-permission android:name="pleos.car.permission.CAR_CLIMATE" />
+    <uses-permission android:name="pleos.car.permission.CAR_SEATS" />
+    <uses-permission android:name="pleos.car.permission.CAR_DOORS" />
+    <!-- 주정차 케어 모드: 공조 전원·설정 온도 제어 / 배터리 잔량 (선언만으로 부여) -->
+    <uses-permission android:name="pleos.car.permission.CONTROL_CAR_CLIMATE" />
+    <uses-permission android:name="pleos.car.permission.CAR_ENERGY" />
+    <!-- Pleos FusedLocation (사용자 허용 필요) / NaviHelper -->
+    <uses-permission android:name="pleos.car.permission.FUSED_LOCATION" />
+    <uses-permission android:name="pleos.car.permission.NAVI_ROUTE" />
+    <uses-permission android:name="pleos.car.permission.NAVI_ROUTE_SEARCH" />
+    <!-- 내비게이션 화면 요청 (장소 검색 화면 열기) -->
+    <uses-permission android:name="pleos.car.permission.NAVI_CUSTOM_MAP" />
+    <!-- 지도 타일 내려받기 -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Android 11+ 패키지 가시성: TTS 엔진 바인딩 -->
+    <queries>
+        <intent><action android:name="android.intent.action.TTS_SERVICE" /></intent>
+    </queries>
+    <application
+        android:name=".PawssengerApp"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@android:style/Theme.Material.Light.NoActionBar">
+        <activity android:name=".ui.MainActivity" android:exported="true">
+            <!-- AAOS: 주행 중에도 화면 유지 (주행 중엔 최소 정보만 표시하도록 설계) -->
+            <meta-data android:name="distractionOptimized" android:value="true" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
