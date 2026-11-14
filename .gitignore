@@ -17,3 +17,7 @@ docs/ref_main_menu.png
 
 # 디자인 시안 (저장소에 올리지 않는다)
 docs/pawssenger-handoff/
+
+# 주정차 케어 모드 영상 원본 (앱에는 줄인 파일만 넣는다)
+docs/stay_video.mp4
+!apk/bori_Pawssenger_release.apk

@@ -70,25 +70,53 @@ tools/build_places.py             장소 데이터 생성 스크립트
 docs/data/                        장소 원본 데이터
 ```
 
-## 빌드와 실행
+## APK 파일
+
+- 위치: [`apk/bori_Pawssenger_release.apk`](apk/bori_Pawssenger_release.apk)
+- release 빌드, 약 95MB
+
+## 실행 방법
+
+1. Pleos Connect 에뮬레이터를 실행합니다 (아래 테스트 환경 참고).
+2. 저장소의 `apk/` 폴더에 있는 APK를 설치하고 실행합니다.
+
+```bash
+adb install -r apk/bori_Pawssenger_release.apk
+adb shell am start -n com.pawssenger.app/.ui.MainActivity
+```
+
+3. 처음 실행하면 기어가 P일 때 권한 안내가 나옵니다. "허용하러 가기"를 눌러 차량 속도와 위치를 허용합니다.
+4. 이동 리포트를 바로 살펴보려면 오른쪽 위 설정에서 "예시 기록 넣기"를 누릅니다.
+
+앱 목록에서 Pawssenger 아이콘을 눌러 실행해도 됩니다.
+
+## 테스트 환경 및 필요한 설정
+
+| 항목 | 내용 |
+|---|---|
+| 에뮬레이터 | Pleos Connect 에뮬레이터 v2.1.0 (`release_connect_v2.1.0`) |
+| OS | Android Automotive OS 14 (API 34), x86_64 |
+| 화면 규격 | 2560×1440, 160dpi (가로형). 앱 표시 영역은 약 1680×1210 |
+| 화면 설계 기준 | 1280×720 시안을 앱 표시 영역에 맞춰 비율대로 확대 |
+| AVD 설정 | Graphics = Hardware, Boot option = Cold boot |
+
+필요한 설정은 다음과 같습니다.
+
+- **권한:** 차량 속도(`android.car.permission.CAR_SPEED`)와 위치(`pleos.car.permission.FUSED_LOCATION`)는 사용자가 허용해야 합니다. 나머지 Pleos 권한은 설치만으로 부여됩니다.
+- **차량 값 조작:** 속도, 기어, 핸들, 공조, 도어, 배터리 등은 에뮬레이터 콘솔(`http://localhost:8088`)에서 바꿉니다. 콘솔 브라우저 창이 열려 있어야 값이 차량에 전달됩니다.
+- **인터넷:** 휴식 추천의 지도 타일을 내려받는 데 필요합니다. 연결이 없으면 약식 지도로 표시됩니다.
+- **실내 온도:** 에뮬레이터는 실내 온도 값을 바꾸지 않으므로 설정의 실내 온도를 "시연"(기본값)으로 둡니다.
+- **주정차 케어 모드:** 기어가 P일 때만 진입할 수 있습니다.
+
+## 소스에서 빌드
 
 개발 환경 설정(Android Studio, Pleos Connect 에뮬레이터 이미지)은 [README_SETUP.md](README_SETUP.md)를 참고하세요.
 
 ```bash
 # JDK 17 필요
 ./gradlew :app:testDebugUnitTest     # 단위 테스트
-./gradlew :app:assembleDebug         # 디버그 빌드
-./gradlew :app:assembleRelease       # 릴리스 빌드 → app/build/outputs/apk/release/
+./gradlew :app:assembleRelease       # 릴리스 빌드 → app/build/outputs/apk/release/app-release.apk
 ```
-
-에뮬레이터에 설치하고 실행합니다.
-
-```bash
-adb install -r app/build/outputs/apk/release/app-release.apk
-adb shell am start -n com.pawssenger.app/.ui.MainActivity
-```
-
-처음 실행하면 기어가 P일 때 차량 속도와 위치 권한을 요청합니다. 이동 리포트를 바로 살펴보려면 설정의 "예시 기록 넣기"를 누르세요.
 
 ## 알아 둘 점
 
