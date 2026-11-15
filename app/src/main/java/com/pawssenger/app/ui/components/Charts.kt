@@ -113,15 +113,22 @@ fun TripChart(points: List<TrendPoint>, markers: List<TripMarker>, elapsedMin: I
         if (points.size >= 2) {
             val pts = points.map { Offset(x(it.x), y(it.score.toFloat())) }
             drawPath(smoothPath(pts), Paw.BrandStrong, style = Stroke(3.dp.toPx(), cap = StrokeCap.Round))
-            // 이벤트가 몰려 있으면 표시와 글자가 겹친다 → 가까운 것은 하나만 그린다.
-            var lastMarkerX = Float.NEGATIVE_INFINITY
+            // 점은 이벤트마다 모두 찍는다. 글자는 가까운 이벤트끼리 묶어 한 번만 쓴다 (예: "급가속 3 · 급제동 1").
+            val gap = 56.dp.toPx()
+            val groups = ArrayList<MutableList<TripMarker>>()
             markers.sortedBy { it.x }.forEach { m ->
-                val c = Offset(x(m.x), y(m.score.toFloat()))
-                if (c.x - lastMarkerX < 44.dp.toPx()) return@forEach
-                lastMarkerX = c.x
-                drawCircle(Color.White, 7.dp.toPx(), c)
-                drawCircle(Level.WARN.colors.accent, 7.dp.toPx(), c, style = Stroke(2.5.dp.toPx()))
-                label(tm, m.label, c.x, c.y + 20.dp.toPx(), Level.WARN.colors.text, 12, true, 0.5f)
+                val g = groups.lastOrNull()
+                if (g != null && x(m.x) - x(g.last().x) < gap) g += m else groups += mutableListOf(m)
+            }
+            groups.forEach { g ->
+                val centers = g.map { Offset(x(it.x), y(it.score.toFloat())) }
+                centers.forEach { c ->
+                    drawCircle(Color.White, 6.dp.toPx(), c)
+                    drawCircle(Level.WARN.colors.accent, 6.dp.toPx(), c, style = Stroke(2.5.dp.toPx()))
+                }
+                val text = g.groupingBy { it.label }.eachCount().entries.joinToString(" · ") { (name, n) -> if (n > 1) "$name $n" else name }
+                val cx = (centers.first().x + centers.last().x) / 2
+                label(tm, text, cx, centers.maxOf { it.y } + 20.dp.toPx(), Level.WARN.colors.text, 12, true, 0.5f)
             }
             val last = pts.last()
             drawCircle(Color.White, 7.dp.toPx(), last)

@@ -62,6 +62,8 @@ class DashboardEngine(
     // 현재 트립의 지수 변화 (elapsedMs, score). 메인 스레드에서만 접근.
     private val series = ArrayList<Pair<Long, Int>>()
     private var seriesTripId = -1
+    /** 그래프에 반영한 이벤트 수. 새 이벤트가 생기면 그 순간의 지수를 바로 기록한다. */
+    private var seriesEventCount = 0
     private var safeStart = true
     private var worst: List<Level?> = List(4) { null }
     private var lastSampleWallMs = 0L
@@ -186,13 +188,18 @@ class DashboardEngine(
         if (d.tripId != seriesTripId) {
             seriesTripId = d.tripId
             series.clear()
+            seriesEventCount = 0
             safeStart = levels.all { it == null || it == Level.GOOD }
             worst = levels
         } else {
             worst = worst.zip(levels) { a, b -> if (a == null) b else if (b == null) a else if (b.ordinal > a.ordinal) b else a }
         }
         val last = series.lastOrNull()
-        if (last == null || d.elapsedMs - last.first >= SERIES_STEP_MS) series += d.elapsedMs to score
+        // 5초마다 한 번, 그리고 이벤트가 감지된 순간에도 기록한다.
+        // (이벤트 순간을 기록하지 않으면 지수 하락이 다음 5초 지점에야 선에 나타나 표시와 어긋난다.)
+        val newEvent = d.events.size > seriesEventCount
+        seriesEventCount = d.events.size
+        if (last == null || newEvent || d.elapsedMs - last.first >= SERIES_STEP_MS) series += d.elapsedMs to score
     }
 
     private fun sampleTrend(score: Int) {

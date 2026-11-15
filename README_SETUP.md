@@ -1,7 +1,5 @@
 # PAWSSENGER 개발 환경 설정 (Windows)
 
-기획 기준 문서: `docs/PAWSSENGER_기획서.txt`
-
 ## 1. 자동 설치
 관리자 PowerShell에서:
 ```
@@ -24,12 +22,11 @@ Set-ExecutionPolicy -Scope Process Bypass
 6. **Pleos Connect SDK 의존성**: Playground 문서의 Gradle 저장소/좌표를 `app/build.gradle.kts` 의 TODO 위치에 추가
 7. **프로젝트 열기**: Android Studio > Open > 이 폴더 → Gradle Sync → 에뮬레이터에서 Run
 
-## 3. GitHub
+## 3. 제출용 APK
 ```
-git init && git add . && git commit -m "init"
-gh repo create pawssenger --private --source . --push
+./gradlew :app:assembleRelease
 ```
-제출 시 APK: `apk/팀명_앱이름_release.apk` (release 빌드). 비공개 저장소면 심사용 계정을 Collaborator로 초대.
+빌드 결과(`app/build/outputs/apk/release/app-release.apk`)를 `apk/bori_Pawssenger_release.apk`로 복사해 저장소에 올린다.
 
 ## 참고
 - https://pleos.ai/playground/resources/en/docs/guide/getting-started/application-development/setup-connect-sdk-emulator

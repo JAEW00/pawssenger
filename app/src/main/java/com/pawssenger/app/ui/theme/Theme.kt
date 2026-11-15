@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.pawssenger.app.comfort.Level
 
-/** docs/pawssenger-handoff/README.md 의 색상 토큰 */
+/** 디자인 시안의 색상 토큰 */
 object Paw {
     val Ink = Color(0xFF1B1730)
     val InkSub = Color(0xFF554E6B)
