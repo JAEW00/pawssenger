@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -78,15 +79,24 @@ private fun DrawScope.label(tm: TextMeasurer, text: String, x: Float, y: Float, 
     drawText(l, topLeft = Offset(x - l.size.width * anchor, y - l.size.height / 2f))
 }
 
+/** 이벤트 종류(급가속·급제동·급회전)별 색. 그래프 아래 눈금과 색 설명이 함께 쓴다. */
+fun tripEventColor(label: String): Color = when (label) {
+    "급가속" -> Color(0xFFE08A00)
+    "급제동" -> Color(0xFFC62828)
+    else -> Paw.BrandStrong
+}
+
 /**
- * 주행 케어: 출발 후 편안함 지수 변화. 배경에 안정/주의/위험 구간 띠, 이벤트 지점 표시.
+ * 주행 케어: 출발 후 편안함 지수 변화. 배경에 안정/주의/위험 구간 띠.
+ * 이벤트는 선 위가 아니라 그래프 아래의 띠에 종류별 색 눈금으로 찍는다 (몰려도 겹쳐 읽히지 않게).
  * 세로축은 50~100 고정.
  */
 @Composable
 fun TripChart(points: List<TrendPoint>, markers: List<TripMarker>, elapsedMin: Int, modifier: Modifier = Modifier) {
     val tm = rememberTextMeasurer()
     Canvas(modifier) {
-        val left = 28.dp.toPx(); val bottom = 34.dp.toPx(); val top = 4.dp.toPx()
+        val lane = 22.dp.toPx()   // 이벤트 눈금 띠의 자리
+        val left = 28.dp.toPx(); val bottom = 34.dp.toPx() + lane; val top = 4.dp.toPx()
         val w = size.width - left; val h = size.height - bottom - top
         fun y(s: Float) = top + (1f - ((s - 50f) / 50f).coerceIn(0f, 1f)) * h
         fun x(f: Float) = left + f * (w - 56.dp.toPx())
@@ -113,22 +123,13 @@ fun TripChart(points: List<TrendPoint>, markers: List<TripMarker>, elapsedMin: I
         if (points.size >= 2) {
             val pts = points.map { Offset(x(it.x), y(it.score.toFloat())) }
             drawPath(smoothPath(pts), Paw.BrandStrong, style = Stroke(3.dp.toPx(), cap = StrokeCap.Round))
-            // 점은 이벤트마다 모두 찍는다. 글자는 가까운 이벤트끼리 묶어 한 번만 쓴다 (예: "급가속 3 · 급제동 1").
-            val gap = 56.dp.toPx()
-            val groups = ArrayList<MutableList<TripMarker>>()
-            markers.sortedBy { it.x }.forEach { m ->
-                val g = groups.lastOrNull()
-                if (g != null && x(m.x) - x(g.last().x) < gap) g += m else groups += mutableListOf(m)
-            }
-            groups.forEach { g ->
-                val centers = g.map { Offset(x(it.x), y(it.score.toFloat())) }
-                centers.forEach { c ->
-                    drawCircle(Color.White, 6.dp.toPx(), c)
-                    drawCircle(Level.WARN.colors.accent, 6.dp.toPx(), c, style = Stroke(2.5.dp.toPx()))
-                }
-                val text = g.groupingBy { it.label }.eachCount().entries.joinToString(" · ") { (name, n) -> if (n > 1) "$name $n" else name }
-                val cx = (centers.first().x + centers.last().x) / 2
-                label(tm, text, cx, centers.maxOf { it.y } + 20.dp.toPx(), Level.WARN.colors.text, 12, true, 0.5f)
+            // 이벤트 띠: 그래프 바로 아래, 이벤트가 난 시각마다 종류별 색 눈금 하나.
+            val laneTop = y(50f) + 6.dp.toPx()
+            val tickH = 12.dp.toPx()
+            drawRoundRect(Paw.Tile, Offset(left, laneTop), Size(w, tickH), CornerRadius(3.dp.toPx()))
+            val tickW = 3.dp.toPx()
+            markers.forEach { m ->
+                drawRoundRect(tripEventColor(m.label), Offset(x(m.x) - tickW / 2, laneTop), Size(tickW, tickH), CornerRadius(tickW / 2))
             }
             val last = pts.last()
             drawCircle(Color.White, 7.dp.toPx(), last)

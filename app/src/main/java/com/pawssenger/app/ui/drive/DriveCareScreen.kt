@@ -55,6 +55,7 @@ import com.pawssenger.app.ui.components.ScreenHeader
 import com.pawssenger.app.ui.components.T
 import com.pawssenger.app.ui.components.TripChart
 import com.pawssenger.app.ui.components.card
+import com.pawssenger.app.ui.components.tripEventColor
 import com.pawssenger.app.ui.components.listScrollbar
 import com.pawssenger.app.ui.components.pageCountOf
 import com.pawssenger.app.ui.theme.Paw
@@ -158,7 +159,17 @@ private fun ChartCard(s: DashboardState, modifier: Modifier) {
     Column(modifier.card().padding(24.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             T("편안함 지수 변화", 18, FontWeight.Bold, modifier = Modifier.weight(1f))
-            if (trip.active) T("출발 후 ${trip.elapsedMin}분", 13, color = Paw.InkSub)
+            if (trip.active) {
+                // 그래프 아래 이벤트 눈금의 색 설명
+                listOf("급가속", "급제동", "급회전").forEach { name ->
+                    Box(Modifier.width(4.dp).height(12.dp).clip(RoundedCornerShape(2.dp)).background(tripEventColor(name)))
+                    Spacer(Modifier.width(5.dp))
+                    T(name, 12, color = Paw.InkSub)
+                    Spacer(Modifier.width(12.dp))
+                }
+                Spacer(Modifier.width(4.dp))
+                T("출발 후 ${trip.elapsedMin}분", 13, color = Paw.InkSub)
+            }
         }
         Spacer(Modifier.height(16.dp))
         Box(Modifier.fillMaxWidth().weight(1f)) {
